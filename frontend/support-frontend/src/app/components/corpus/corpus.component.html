@@ -1,0 +1,51 @@
+<div class="glass-panel corpus-card">
+  <div class="card-header">
+    <div class="card-title">
+      <i class="fa-solid fa-book-bookmark text-cyan"></i>
+      <span>Knowledge Vector Corpus</span>
+    </div>
+    <span class="count-badge">{{ filteredTickets.length }} / {{ tickets.length }} tickets</span>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (input)="applyFilter()" 
+        placeholder="Search corpus vectors...">
+    </div>
+
+    <div class="category-pills">
+      <button 
+        *ngFor="let cat of categories" 
+        type="button" 
+        class="cat-pill" 
+        [class.active]="selectedCategory === cat"
+        (click)="filterByCategory(cat)">
+        {{ cat }}
+      </button>
+    </div>
+  </div>
+
+  <div class="corpus-list">
+    <div 
+      *ngFor="let t of filteredTickets" 
+      class="corpus-item"
+      (click)="selectTicket(t.text)"
+      title="Click to copy into ticket input">
+      
+      <div class="item-header">
+        <span class="ticket-id">{{ t.id }}</span>
+        <span class="badge badge-{{ t.category.toLowerCase().replace(' ', '') }}">{{ t.category }}</span>
+      </div>
+
+      <div class="item-text">{{ t.text }}</div>
+    </div>
+
+    <div *ngIf="filteredTickets.length === 0" class="empty-corpus">
+      No matching tickets found in corpus.
+    </div>
+  </div>
+</div>

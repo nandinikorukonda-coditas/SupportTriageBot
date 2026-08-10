@@ -1,0 +1,113 @@
+<div class="glass-panel details-card">
+  <!-- EMPTY STATE -->
+  <div *ngIf="!ticket" class="empty-state">
+    <div class="empty-icon">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+    </div>
+    <div class="empty-title">No Ticket Selected</div>
+    <div class="empty-subtitle">
+      Submit a text or audio ticket on the left (or pick a Quick Test Sample) to run RAG vector search & ReAct agent triage.
+    </div>
+  </div>
+
+  <!-- RESULT STATE -->
+  <div *ngIf="ticket" class="details-content">
+    <!-- Header Banner -->
+    <div class="details-header">
+      <div class="header-left">
+        <span class="ticket-id-tag">{{ ticket.ticketId || ticket.ticket_id || 'TKT-LIVE' }}</span>
+        <span class="badge badge-{{ ticket.category.toLowerCase().replace(' ', '') }}">
+          <i class="fa-solid fa-tag"></i> {{ ticket.category }}
+        </span>
+        <span class="channel-pill">
+          <i class="fa-solid" [ngClass]="ticket.channel === 'voice' ? 'fa-microphone' : 'fa-align-left'"></i>
+          {{ ticket.channel | titlecase }}
+        </span>
+      </div>
+
+      <div class="header-right">
+        <div class="metric-box" title="Processing execution latency">
+          <i class="fa-solid fa-bolt text-gold"></i>
+          <span>{{ ticket.timingMs }}ms</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confidence Meter -->
+    <div class="confidence-bar-container">
+      <div class="confidence-label">
+        <span>Routing Confidence:</span>
+        <span class="confidence-val">{{ ticket.confidence | percent:'1.0-1' }}</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" [style.width.%]="ticket.confidence * 100"></div>
+      </div>
+    </div>
+
+    <!-- Original Query -->
+    <div class="section-box query-box">
+      <div class="section-label"><i class="fa-solid fa-quote-left"></i> Original Ticket Context:</div>
+      <p class="query-text">"{{ ticket.originalText }}"</p>
+    </div>
+
+    <!-- AI Suggested Response -->
+    <div class="section-box response-box">
+      <div class="response-header">
+        <div class="section-label"><i class="fa-solid fa-robot"></i> AI Specialist Suggested Reply:</div>
+        <button type="button" class="btn-secondary copy-btn" (click)="copyResponse()">
+          <i class="fa-solid" [ngClass]="copied ? 'fa-check text-green' : 'fa-copy'"></i>
+          <span>{{ copied ? 'Copied!' : 'Copy' }}</span>
+        </button>
+      </div>
+      <div class="response-content">{{ ticket.suggestedResponse }}</div>
+    </div>
+
+    <!-- Matched RAG References -->
+    <div *ngIf="ticket.similarTicketIds?.length" class="section-box rag-box">
+      <div class="section-label"><i class="fa-solid fa-database"></i> Vector Store RAG Matches:</div>
+      <div class="rag-tags">
+        <span *ngFor="let id of ticket.similarTicketIds" class="rag-tag">
+          <i class="fa-solid fa-link"></i> {{ id }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Tools Triggered -->
+    <div *ngIf="ticket.toolCalls?.length" class="section-box tools-box">
+      <div class="section-label"><i class="fa-solid fa-screwdriver-wrench"></i> Triggered MCP & Agent Tools:</div>
+      <div class="tool-pills">
+        <span *ngFor="let tool of ticket.toolCalls" class="tool-pill">
+          <i class="fa-solid fa-gear"></i> {{ tool.toolName }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ReAct Agent Execution Trace -->
+    <div class="section-box trace-box">
+      <div class="section-label"><i class="fa-solid fa-network-wired"></i> ReAct Agent Thought/Action Execution Trace:</div>
+      
+      <div class="trace-timeline">
+        <div *ngFor="let stage of ticket.agentTrace; let i = index" class="trace-item">
+          <div class="trace-dot"></div>
+          <div class="trace-content">
+            <div class="trace-title">
+              <span class="step-num">Step {{ i + 1 }}</span>
+              <span class="stage-name">{{ stage.name }}</span>
+              <span class="stage-status"><i class="fa-solid fa-circle-check"></i> Complete</span>
+            </div>
+            <div class="trace-detail">{{ stage.detail }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MCP Filing Action -->
+    <div class="section-box mcp-file-box">
+      <div class="section-label"><i class="fa-solid fa-box-archive"></i> MCP Protocol Ticket Store Filing:</div>
+      <textarea [(ngModel)]="agentComment" rows="2" placeholder="Add supervisor notes or audit comments..."></textarea>
+      <button class="btn-primary file-btn" (click)="submitFile()">
+        <i class="fa-solid fa-cloud-arrow-up"></i> File & Store Ticket via MCP Server
+      </button>
+    </div>
+  </div>
+</div>

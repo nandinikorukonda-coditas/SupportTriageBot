@@ -1,0 +1,93 @@
+<div class="glass-panel new-ticket-card">
+  <div class="card-header">
+    <div class="card-title">
+      <i class="fa-solid fa-square-plus text-gradient"></i>
+      <span>Create New Ticket</span>
+    </div>
+    <div class="tab-switcher">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'text'"
+        (click)="activeTab = 'text'">
+        <i class="fa-solid fa-pen-to-square"></i> Text
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'voice'"
+        (click)="activeTab = 'voice'">
+        <i class="fa-solid fa-microphone"></i> Voice
+      </button>
+    </div>
+  </div>
+
+  <!-- TEXT TAB -->
+  <div *ngIf="activeTab === 'text'" class="tab-content">
+    <div class="preset-header">
+      <span>Quick Test Samples:</span>
+    </div>
+    <div class="presets-row">
+      <button 
+        *ngFor="let p of quickPresets" 
+        type="button" 
+        class="preset-pill"
+        (click)="usePreset(p.text)">
+        {{ p.label }}
+      </button>
+    </div>
+
+    <textarea 
+      [(ngModel)]="text" 
+      rows="4" 
+      placeholder="Describe your customer issue or paste ticket text here..."
+      [disabled]="processing">
+    </textarea>
+
+    <div class="card-footer">
+      <div class="char-count" *ngIf="text.length">
+        {{ text.length }} characters
+      </div>
+      <button 
+        class="btn-primary" 
+        (click)="submitText()" 
+        [disabled]="processing || !text.trim()">
+        <i class="fa-solid" [ngClass]="processing ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+        <span>{{ processing ? 'Analyzing & Routing...' : 'Triage Ticket' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- VOICE TAB -->
+  <div *ngIf="activeTab === 'voice'" class="tab-content">
+    <div class="voice-drop-zone">
+      <i class="fa-solid fa-file-audio mic-icon"></i>
+      <div class="drop-title">Upload Audio Ticket</div>
+      <div class="drop-subtitle">Supports .mp3, .wav, .m4a audio recordings</div>
+      
+      <label class="btn-primary upload-btn">
+        <i class="fa-solid fa-upload"></i> Select Audio File
+        <input type="file" (change)="uploadVoiceFile($event)" accept="audio/*" [disabled]="processing">
+      </label>
+    </div>
+
+    <div class="preset-header" style="margin-top: 16px;">
+      <span>Or Test Sample Audio Recording:</span>
+    </div>
+    <div class="presets-column">
+      <button 
+        *ngFor="let audio of sampleAudioFiles" 
+        type="button" 
+        class="preset-pill audio-pill"
+        (click)="triggerSampleAudio(audio.name)"
+        [disabled]="processing">
+        <i class="fa-solid fa-play"></i> {{ audio.label }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="processing" class="processing-overlay">
+    <div class="spinner"></div>
+    <div class="processing-text">Executing RAG Search & Multi-Agent Loop...</div>
+  </div>
+</div>

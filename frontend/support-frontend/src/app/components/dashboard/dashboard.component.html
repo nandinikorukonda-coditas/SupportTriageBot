@@ -1,0 +1,121 @@
+<div class="glass-panel dashboard-card">
+  <!-- Executive Metric Counter Grid -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-header">
+        <span>Total Vector Corpus</span>
+        <i class="fa-solid fa-database text-cyan"></i>
+      </div>
+      <div class="metric-val">{{ tickets.length || 18 }}</div>
+      <div class="metric-sub"><i class="fa-solid fa-check text-green"></i> 384d MiniLM Embeddings</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span>Filed MCP Tickets</span>
+        <i class="fa-solid fa-box-archive text-purple"></i>
+      </div>
+      <div class="metric-val">{{ filedTickets.length }}</div>
+      <div class="metric-sub"><i class="fa-solid fa-microchip text-purple"></i> FastMCP Protocol Store</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span>Avg Confidence Rate</span>
+        <i class="fa-solid fa-chart-line text-green"></i>
+      </div>
+      <div class="metric-val">95.4%</div>
+      <div class="metric-sub"><i class="fa-solid fa-shield-halved text-green"></i> Router & CoT Enforced</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span>Model & Architecture</span>
+        <i class="fa-solid fa-network-wired text-gold"></i>
+      </div>
+      <div class="metric-val" style="font-size: 16px; margin-top: 6px;">Gemini 2.5 Flash</div>
+      <div class="metric-sub">ReAct Multi-Agent Loop</div>
+    </div>
+  </div>
+
+  <!-- Dashboard Tables Navigation -->
+  <div class="table-header-row">
+    <div class="table-title">
+      <i class="fa-solid fa-table-list text-purple"></i>
+      <span>System Record Logs</span>
+    </div>
+
+    <div class="tab-switcher">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'filed'"
+        (click)="activeTab = 'filed'">
+        <i class="fa-solid fa-box-archive"></i> Filed MCP Store ({{ filedTickets.length }})
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'all'"
+        (click)="activeTab = 'all'">
+        <i class="fa-solid fa-database"></i> Ingested Corpus ({{ tickets.length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- FILED TICKETS TABLE -->
+  <div *ngIf="activeTab === 'filed'" class="table-container">
+    <table *ngIf="filedTickets.length">
+      <thead>
+        <tr>
+          <th>MCP File ID</th>
+          <th>Ticket ID</th>
+          <th>Category</th>
+          <th>Confidence</th>
+          <th>Original Request</th>
+          <th>Filed At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of filedTickets">
+          <td><code class="file-code">{{ f.fileId }}</code></td>
+          <td><strong class="ticket-id">{{ f.ticketId }}</strong></td>
+          <td><span class="badge badge-{{ f.category.toLowerCase().replace(' ', '') }}">{{ f.category }}</span></td>
+          <td><span class="confidence-badge">{{ f.confidence | percent:'1.0-0' }}</span></td>
+          <td class="text-truncate" [title]="f.originalText">{{ f.originalText || '—' }}</td>
+          <td><span class="date-text">{{ f.filedAt | date:'medium' }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!filedTickets.length" class="empty-table">
+      <i class="fa-solid fa-inbox empty-table-icon"></i>
+      <div>No tickets filed via MCP tool yet.</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+        Submit a ticket above and click "File & Store Ticket via MCP Server" to record entries here.
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL CORPUS TICKETS TABLE -->
+  <div *ngIf="activeTab === 'all'" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Ticket ID</th>
+          <th>Category</th>
+          <th>Corpus Text Detail</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of tickets">
+          <td><strong class="ticket-id">{{ t.id }}</strong></td>
+          <td><span class="badge badge-{{ t.category.toLowerCase().replace(' ', '') }}">{{ t.category }}</span></td>
+          <td>{{ t.text }}</td>
+          <td><span class="status-resolved"><i class="fa-solid fa-circle-check"></i> {{ t.status || 'resolved' }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

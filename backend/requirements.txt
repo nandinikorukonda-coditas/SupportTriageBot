@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-dotenv
+openai
+sentence-transformers
+mcp
+python-multipart
+numpy
